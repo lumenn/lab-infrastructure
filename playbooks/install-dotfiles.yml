@@ -1,0 +1,61 @@
+---
+- name: Install/Update dotfiles and default software.
+  hosts: all
+  tasks:
+    - name: Ensure git, fish, unzip is installed.
+      apt:
+        name: 
+          - build-essential
+          - git
+          - fish
+          - unzip
+          - cargo
+          - golang
+          - npm
+        state: present
+        update_cache: yes
+      become: true
+
+    - name: Download starship.
+      get_url:
+        url: https://starship.rs/install.sh
+        dest: /tmp/install_starship.sh
+        mode: '770'
+
+    - name: Install starship. 
+      shell: /tmp/install_starship.sh -y 
+      become: true
+  
+    - name: Ensure fish is default shell.
+      user:
+        name: "{{ ansible_user }}"
+        shell: "/usr/bin/fish"
+      become: true
+
+    - name: Download latest nvim.
+      get_url:
+        url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+        dest: /tmp/nvim-linux64.tar.gz
+        
+    - name: Unarchive nvim.
+      unarchive:
+        remote_src: true
+        src: /tmp/nvim-linux64.tar.gz
+        dest: /opt
+      become: true
+
+    - name: Pull dotfiles.
+      git:
+        repo: 'https://github.com/lumenn/dotfiles.git'
+        dest: ~/dotfiles
+
+    - name: Copy dotfiles.
+      copy:
+        remote_src: yes
+        src: ~/dotfiles/
+        dest: ~/
+
+    - name: Reboot machine.
+      reboot:
+        reboot_timeout: 60
+      become: true

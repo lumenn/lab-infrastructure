@@ -1,0 +1,32 @@
+---
+- name: Install podman.
+  hosts: all
+  tasks:
+    - name: Ensure podman is installed.
+      apt:
+        name: 
+          - dbus-user-session
+          - podman
+          - podman-compose
+        state: present
+        update_cache: yes
+      become: true
+
+    - name: Ensure dbus service is running and enabled.
+      systemd:
+        name: dbus
+        state: started
+        enabled: true
+        scope: user
+    
+    - name: Download latest podlet.
+      get_url:
+        url: https://github.com/containers/podlet/releases/latest/download/podlet-x86_64-unknown-linux-gnu.tar.xz
+        dest: /tmp/podlet.tar.xz
+
+    - name: Unarchive podlet.
+      unarchive:
+        remote_src: true
+        src: /tmp/podlet.tar.xz
+        dest: /opt
+      become: true
