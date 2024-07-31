@@ -81,10 +81,12 @@ resource "ansible_playbook" "freyr_podman" {
   playbook   = "./playbooks/install-podman.yml"
   name       = local.freyr_fqdn
   depends_on = [time_sleep.freyr_wait_before_ansible]
+  replayable = false
 }
 
 resource "ansible_playbook" "freyr_dotfiles" {
   playbook   = "./playbooks/install-dotfiles.yml"
   name       = local.freyr_fqdn
   depends_on = [ansible_playbook.freyr_podman]
+  replayable = false
 }
