@@ -2,12 +2,33 @@
 - name: Install podman.
   hosts: all
   tasks:
+    - name: Ensure gpg is insalled.
+      become: true
+      apt:
+        name:
+          - gpg
+        state: present
+
+    - name: Add alvistack repository key.
+      become: true
+      apt_key:
+        url: http://downloadcontent.opensuse.org/repositories/home:/alvistack/Debian_{{ ansible_distribution_major_version }}/Release.key
+        state: present
+
+    - name: Add alvistack repository.
+      become: true
+      apt_repository:
+        repo: deb http://downloadcontent.opensuse.org/repositories/home:/alvistack/Debian_{{ ansible_distribution_major_version }}/ /
+        state: present
+
     - name: Ensure podman is installed.
       apt:
         name: 
           - dbus-user-session
           - podman
           - podman-compose
+          - rootlesskit
+          - netavark
         state: present
         update_cache: yes
       become: true
@@ -19,14 +40,20 @@
         enabled: true
         scope: user
     
+    - name: Update & Upgrade.
+      apt:
+        upgrade: "full"
+        update_cache: yes
+      become: true
+      
     - name: Download latest podlet.
       get_url:
         url: https://github.com/containers/podlet/releases/latest/download/podlet-x86_64-unknown-linux-gnu.tar.xz
         dest: /tmp/podlet.tar.xz
 
     - name: Unarchive podlet.
+      become: true
       unarchive:
         remote_src: true
         src: /tmp/podlet.tar.xz
         dest: /opt
-      become: true

@@ -11,7 +11,6 @@
           - unzip
           - cargo
           - golang
-          - npm
         state: present
         update_cache: yes
       become: true
