@@ -2,6 +2,31 @@ locals {
   env = terraform.workspace == "default" ? "dev" : terraform.workspace
 }
 
+variable "cloudflare_api_token" {
+  description = "Token allowing access to cloudflare."
+  type        = string
+}
+
+variable "cloudflare_personal_zone" {
+  description = "Zone under which DNS records will be modified."
+  type        = string
+}
+
+variable "public_ipv4" {
+  description = "Public IPv4 address."
+  type        = string
+}
+
+variable "public_ipv6" {
+  description = "Public IPv4 address."
+  type        = string
+}
+
+variable "public_domain" {
+  description = "Public domain name."
+  type        = string
+}
+
 variable "proxmox_api_token" {
   description = "Proxmox API token accordint to this schema username@realm!provider=xxxx-xxx-xxx-xxx"
   type        = string
